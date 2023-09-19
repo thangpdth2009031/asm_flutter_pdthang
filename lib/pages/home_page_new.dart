@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../core/constant/dimension_constant.dart';
 import '../core/hepper/ImageHelper.dart';
 import '../core/hepper/TextStyles.dart';
-import '../utils/contants.dart';
 import '../widgets/app_bar_container.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -12,7 +11,7 @@ class Place {
   final int id;
   final String thumbnail;
   final String name;
-  final int star;
+  final int? star;
 
   Place(
       {required this.id,
@@ -39,11 +38,15 @@ class HomePageNew extends StatefulWidget {
 class _HomePageNewState extends State<HomePageNew> {
   Future<List<Place>> fetchData() async {
     try {
-      final String url = 'http://10.22.186.86:8888/api/getAllPlace';
+      final String url = 'http://192.168.1.154:8888/api/getAllPlace';
       final response = await http.get(Uri.parse(url));
-
       if (response.statusCode == 200) {
-        List<dynamic> jsonResponse = json.decode(response.body);
+        // Giải mã dữ liệu nhận được từ server bằng UTF-8
+        final utf8DecodedData = utf8.decode(response.bodyBytes);
+
+        // Chuyển đổi dữ liệu UTF-8 sang JSON
+        List<dynamic> jsonResponse = json.decode(utf8DecodedData);
+        print(jsonResponse);
         return jsonResponse.map((data) => Place.fromJson(data)).toList();
       } else {
         throw Exception('Unexpected error occurred!');
@@ -56,7 +59,7 @@ class _HomePageNewState extends State<HomePageNew> {
   Widget _buildImageHomeScreen(String name, String image, int star) {
     return GestureDetector(
       onTap: () {
-        /*Navigator.push(context, MaterialPageRoute(builder: (context) => SearchResultPage()))*/
+        // Navigator.push(context, MaterialPageRoute(builder: (context) => SearchResultPage()))
       },
       child: Container(
         child: Stack(
@@ -95,7 +98,7 @@ class _HomePageNewState extends State<HomePageNew> {
                       borderRadius: BorderRadius.circular(kMinPadding),
                       color: Colors.white.withOpacity(0.4),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
@@ -105,7 +108,7 @@ class _HomePageNewState extends State<HomePageNew> {
                         SizedBox(
                           width: kItemPadding,
                         ),
-                        Text(star)
+                        Text(star.toString())
                       ],
                     ),
                   )
@@ -194,12 +197,75 @@ class _HomePageNewState extends State<HomePageNew> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      buttonHoltel(
-                          "Hotel", "https://i.ibb.co/HhyMJ20/ico-hotel.png"),
-                      buttonFlight("Flights",
-                          "https://i.ibb.co/PtFzX2j/ico-hotel-plane.png"),
-                      buttonAll("All",
-                          "https://i.ibb.co/PtFzX2j/ico-hotel-plane.png"),
+                      Column(
+                        children: <Widget>[
+                          ElevatedButton(
+                            onPressed: () {
+
+                            },
+                            style: ElevatedButton.styleFrom(
+                              primary: Color(0xFFFDE6D8),
+                              shadowColor: Colors.transparent,
+                            ),
+                            child: Image.asset(
+                              "assets/image/ico_hotel.png",
+                              width: 70,
+                              height: 70,
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            "Hotel",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                      SizedBox(width: 16),
+                      Column(
+                        children: <Widget>[
+                          ElevatedButton(
+                            onPressed: () {
+                            },
+                            style: ElevatedButton.styleFrom(
+                              primary: Color(0xFFF9DEE1),
+                              shadowColor: Colors.transparent,
+                            ),
+                            child: Image.asset(
+                              "assets/image/ico_plane.png",
+                              width: 70,
+                              height: 70,
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            "Flights",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                      SizedBox(width: 16),
+                      Column(
+                        children: <Widget>[
+                          ElevatedButton(
+                            onPressed: () {
+                            },
+                            style: ElevatedButton.styleFrom(
+                              primary: Color.fromRGBO(210, 239, 239, 1.0),
+                              shadowColor: Colors.transparent,
+                            ),
+                            child: Image.asset(
+                              "assets/image/ico_hotel_plane.png",
+                              width: 70,
+                              height: 70,
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            "All",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -244,7 +310,7 @@ class _HomePageNewState extends State<HomePageNew> {
                                     (e) => _buildImageHomeScreen(
                                       e.name,
                                       e.thumbnail,
-                                      e.star,
+                                      e.star ?? 0
                                     ),
                                   )
                                   .toList(),
@@ -264,60 +330,3 @@ class _HomePageNewState extends State<HomePageNew> {
   }
 }
 
-Widget buttonHoltel(String label, String imagePath) {
-  return Column(
-    children: [
-      ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          primary: Colors.orangeAccent.withOpacity(0.3),
-
-        ),
-        child: Image.network(
-          imagePath,
-          height: 80,
-        ),
-      ),
-      SizedBox(height: 8),
-      Text(label),
-    ],
-  );
-}
-
-Widget buttonFlight(String label, String imagePath) {
-  return Column(
-    children: [
-      ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          primary: Colors.pink.withOpacity(0.3),
-        ),
-        child: Image.network(
-          imagePath,
-          height: 80,
-        ),
-      ),
-      SizedBox(height: 8),
-      Text(label),
-    ],
-  );
-}
-
-Widget buttonAll(String label, String imagePath) {
-  return Column(
-    children: [
-      ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          primary: Colors.greenAccent.withOpacity(0.3),
-        ),
-        child: Image.network(
-          imagePath,
-          height: 80,
-        ),
-      ),
-      SizedBox(height: 8),
-      Text(label),
-    ],
-  );
-}

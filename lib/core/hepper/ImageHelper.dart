@@ -10,7 +10,7 @@ class ImageHelper {
       Alignment? alignment}) {
     return ClipRRect(
       borderRadius: radius ?? BorderRadius.zero,
-      child: Image.asset(
+      child: Image.network(
         imagePath,
         width: width,
         height: height,
