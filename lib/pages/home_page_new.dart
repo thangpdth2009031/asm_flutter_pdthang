@@ -14,28 +14,22 @@ class Place {
   final String name;
   final int star;
 
-  Place({
-    required this.id,
-    required this.thumbnail,
-    required this.name,
-    required this.star
-  });
+  Place(
+      {required this.id,
+      required this.thumbnail,
+      required this.name,
+      required this.star});
 
   factory Place.fromJson(Map<String, dynamic> json) {
     return Place(
-      id: json['id'],
-      thumbnail: json['thumbnail'],
-      name: json['name'],
-      star: json['star']
-    );
+        id: json['id'],
+        thumbnail: json['thumbnail'],
+        name: json['name'],
+        star: json['star']);
   }
 }
 
-
-
 class HomePageNew extends StatefulWidget {
-
-
   const HomePageNew({super.key});
 
   @override
@@ -44,27 +38,22 @@ class HomePageNew extends StatefulWidget {
 
 class _HomePageNewState extends State<HomePageNew> {
   Future<List<Place>> fetchData() async {
-    String url = LOCAL_HOST + ":" + PORT.toString();
-    final response = await http.get(Uri.http(url, "/api/getAllPlace"));
+    try {
+      final String url = 'http://10.22.186.86:8888/api/getAllPlace';
+      final response = await http.get(Uri.parse(url));
 
-    if (response.statusCode == 200) {
-      List jsonResponse = json.decode(response.body);
-      print(jsonResponse);
-      return jsonResponse.map((data) => Place.fromJson(data)).toList();
-    } else {
-      throw Exception('Unexpected error occured!');
+      if (response.statusCode == 200) {
+        List<dynamic> jsonResponse = json.decode(response.body);
+        return jsonResponse.map((data) => Place.fromJson(data)).toList();
+      } else {
+        throw Exception('Unexpected error occurred!');
+      }
+    } catch (error) {
+      throw Exception('Failed to fetch data: $error');
     }
   }
-  final List<Map<String, String>> listImageLeft = [
-    {'name': 'Korea', 'image': "assets/images/korea.png"},
-    {'name': 'Dubai', 'image': "assets/images/dubai.png"},
-    {'name': 'Turkey', 'image': "assets/images/turkey.png"},
-    {'name': 'Japan', 'image': "assets/images/japan.png"},
-    {'name': 'Korea', 'image': "assets/images/korea.png"},
-    {'name': 'Korea', 'image': "assets/images/korea.png"},
-  ];
 
-  Widget _buildImageHomeScreen(String name, String image) {
+  Widget _buildImageHomeScreen(String name, String image, int star) {
     return GestureDetector(
       onTap: () {
         /*Navigator.push(context, MaterialPageRoute(builder: (context) => SearchResultPage()))*/
@@ -110,13 +99,13 @@ class _HomePageNewState extends State<HomePageNew> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          Icons.start,
+                          Icons.star,
                           color: Color(0xffFFC107),
                         ),
                         SizedBox(
                           width: kItemPadding,
                         ),
-                        Text('4.5')
+                        Text(star)
                       ],
                     ),
                   )
@@ -134,87 +123,101 @@ class _HomePageNewState extends State<HomePageNew> {
     // TODO: implement build
     return Container(
       child: SafeArea(
-          child: Scaffold(
-        body: AppBarContainer(
-          titleString: 'home',
-          title: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: kItemPadding),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Hi Guy',
-                      style: TextStyles
-                          .defaultStyle.fontHeader.whiteTextColor.bold,
-                    ),
-                    const SizedBox(
-                      height: kMediumPadding,
-                    ),
-                    Text(
-                      'Where are you going next ?',
-                      style: TextStyles.defaultStyle.fontCaption.whiteTextColor,
-                    )
-                  ],
-                )
-              ],
-            ),
-          ),
-          implementLeading: false,
-          child: Column(
-            children: [
-              TextField(
-                enabled: true,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  hintText: 'Search you destination',
-                  prefixIcon: Padding(
-                    padding: EdgeInsets.all(0.8),
-                    child: Icon(
-                      FontAwesomeIcons.magnifyingGlass,
-                      color: Colors.black,
-                      size: 14,
-                    ),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(
-                        kItemPadding,
-                      ),
-                    ),
-                  ),
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: kItemPadding),
-                ),
-                style: TextStyles.defaultStyle,
-                onChanged: (value) {},
-                onSubmitted: (String submitValue) {},
-              ),
-              const SizedBox(
-                height: kDefaultPadding,
-              ),
-              const SizedBox(
-                height: kMediumPadding,
-              ),
-              Row(
+        child: Scaffold(
+          body: AppBarContainer(
+            titleString: 'home',
+            title: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: kItemPadding),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Popular Destinations',
-                    style: TextStyles.defaultStyle.bold,
-                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Hi Guy',
+                        style: TextStyles
+                            .defaultStyle.fontHeader.whiteTextColor.bold,
+                      ),
+                      const SizedBox(
+                        height: kMediumPadding,
+                      ),
+                      Text(
+                        'Where are you going next ?',
+                        style:
+                            TextStyles.defaultStyle.fontCaption.whiteTextColor,
+                      )
+                    ],
+                  )
                 ],
               ),
-              const SizedBox(
-                height: kMediumPadding,
-              ),
-              Expanded(
-                child: FutureBuilder<List<Place>>(
+            ),
+            implementLeading: false,
+            child: Column(
+              children: [
+                TextField(
+                  enabled: true,
+                  autocorrect: false,
+                  decoration: const InputDecoration(
+                    hintText: 'Search your destination',
+                    // Corrected typo
+                    prefixIcon: Padding(
+                      padding: EdgeInsets.all(0.8),
+                      child: Icon(
+                        FontAwesomeIcons.magnifyingGlass,
+                        color: Colors.black,
+                        size: 14,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(
+                          kItemPadding,
+                        ),
+                      ),
+                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: kItemPadding),
+                  ),
+                  style: TextStyles.defaultStyle,
+                  onChanged: (value) {},
+                  onSubmitted: (String submitValue) {},
+                ),
+                const SizedBox(
+                  height: kDefaultPadding,
+                ),
+                Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      buttonHoltel(
+                          "Hotel", "https://i.ibb.co/HhyMJ20/ico-hotel.png"),
+                      buttonFlight("Flights",
+                          "https://i.ibb.co/PtFzX2j/ico-hotel-plane.png"),
+                      buttonAll("All",
+                          "https://i.ibb.co/PtFzX2j/ico-hotel-plane.png"),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: kMediumPadding,
+                ),
+                Row(
+                  children: [
+                    Text(
+                      'Popular Destinations',
+                      style: TextStyles.defaultStyle.bold,
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: kMediumPadding,
+                ),
+                FutureBuilder<List<Place>>(
                   future: fetchData(),
                   builder: (BuildContext context,
                       AsyncSnapshot<List<Place>> snapshot) {
@@ -226,42 +229,95 @@ class _HomePageNewState extends State<HomePageNew> {
 
                     List<Place> place = snapshot.data!;
 
-                    return ListView.builder(
-                      itemCount: place.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        Place item = place[index];
-                        return Expanded(
-                            child: CustomScrollView(
-                              primary: false,
-                              slivers: <Widget>[
-                                SliverPadding(
-                                  padding: const EdgeInsets.all(0),
-                                  sliver: SliverGrid.count(
-                                    crossAxisSpacing: 10,
-                                    mainAxisSpacing: 10,
-                                    crossAxisCount: 2,
-                                    children: listImageLeft
-                                        .map(
-                                          (e) => _buildImageHomeScreen(
-                                        e['name']!,
-                                        e['image']!,
-                                      ),
-                                    )
-                                        .toList(),
-                                  ),
-                                )
-                              ],
-                            ));
-                      },
+                    return Expanded(
+                      child: CustomScrollView(
+                        primary: false,
+                        slivers: <Widget>[
+                          SliverPadding(
+                            padding: const EdgeInsets.all(0),
+                            sliver: SliverGrid.count(
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                              crossAxisCount: 2,
+                              children: place
+                                  .map(
+                                    (e) => _buildImageHomeScreen(
+                                      e.name,
+                                      e.thumbnail,
+                                      e.star,
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                          )
+                        ],
+                      ),
                     );
                   },
                 ),
-              ),
-
-            ],
+              ],
+            ),
           ),
         ),
-      )),
+      ),
     );
   }
+}
+
+Widget buttonHoltel(String label, String imagePath) {
+  return Column(
+    children: [
+      ElevatedButton(
+        onPressed: () {},
+        style: ElevatedButton.styleFrom(
+          primary: Colors.orangeAccent.withOpacity(0.3),
+
+        ),
+        child: Image.network(
+          imagePath,
+          height: 80,
+        ),
+      ),
+      SizedBox(height: 8),
+      Text(label),
+    ],
+  );
+}
+
+Widget buttonFlight(String label, String imagePath) {
+  return Column(
+    children: [
+      ElevatedButton(
+        onPressed: () {},
+        style: ElevatedButton.styleFrom(
+          primary: Colors.pink.withOpacity(0.3),
+        ),
+        child: Image.network(
+          imagePath,
+          height: 80,
+        ),
+      ),
+      SizedBox(height: 8),
+      Text(label),
+    ],
+  );
+}
+
+Widget buttonAll(String label, String imagePath) {
+  return Column(
+    children: [
+      ElevatedButton(
+        onPressed: () {},
+        style: ElevatedButton.styleFrom(
+          primary: Colors.greenAccent.withOpacity(0.3),
+        ),
+        child: Image.network(
+          imagePath,
+          height: 80,
+        ),
+      ),
+      SizedBox(height: 8),
+      Text(label),
+    ],
+  );
 }

@@ -1,2 +1,2 @@
-const String LOCAL_HOST = "10.0.2.2";
+const String LOCAL_HOST = "10.22.186.86";
 const int PORT = 8888;
